@@ -1,0 +1,106 @@
+&equations
+!yaml file defining spatial dependance of material properties
+MaterialFileName =  'Nepal_rho_mu_lambda_Qs_Qp_dam.yaml'
+!off-fault plasticity parameters (ignored if Plasticity=0)
+Plasticity= 0
+Tv=0.05
+!Attenuation parameters (ignored if not compiled with attenuation)
+FreqCentral=0.3
+FreqRatio=100
+/
+
+&IniCondition
+/
+
+&Boundaries
+BC_fs = 1                               ! enable free surface boundaries
+BC_dr = 1                               ! enable fault boundaries
+BC_of = 1                               ! enable absorbing boundaries
+/
+
+&DynamicRupture
+FL = 34                                        ! Friction law
+!0: none, 16:LSW, 103: RS with strong velocity weakening
+!yaml file defining spatial dependance of fault properties
+ModelFileName = 'Wei_fault.yaml'
+
+!reference vector for defining strike and dip direction
+XRef = 0.0
+YRef = 0.0
+ZRef = -1.0
+refPointMethod = 1
+
+! RF_output_on = 0                               ! Rupture front ascii output
+! ! magnitude_output_on =0                         ! Moment magnitude output
+! ! energy_rate_output_on=0                        ! Moment rate output
+! OutputPointType = 4                            ! Type (0: no output, 3: ascii file, 4: paraview file, 5: 3+4)
+! SlipRateOutputType=0        ! 0: (smoother) slip rate output evaluated from the difference between the velocity on both side of the fault
+                            ! 1: slip rate output evaluated from the fault tractions and the failure criterion (less smooth but usually more accurate where the rupture front is well developped)
+/
+
+! !see: https://seissol.readthedocs.io/en/latest/fault-output.html
+! ! parameterize paraview file output
+! &Elementwise
+! printIntervalCriterion = 2                     ! 1=iteration, 2=time
+! printtimeinterval_sec = 5.00                   ! Time interval at which output will be written
+! OutputMask = 1 1 0 0 1 1 1 1 1 1 0             ! turn on and off fault outputs
+! refinement_strategy = 2
+! refinement = 1
+! /
+
+
+&SourceType
+/
+
+&SpongeLayer
+/
+
+&MeshNml
+MeshFile = 'meshes/model3_5kmtopo_fault_0.1Hz_ve_f800'         ! Name of mesh file
+meshgenerator = 'PUML'          ! Name of meshgenerator (Gambit3D-fast, Netcdf or PUML)
+/
+
+&Discretization
+CFL = 0.3                            ! CFL number (<=1.0)
+ClusteredLTS = 1                     ! 1 for Global time stepping, 2,3,5,... Local time stepping (advised value 2)
+FixTimeStep = 5
+!ClusteredLTS defines the multi-rate for the time steps of the clusters 2 for Local time stepping
+! LtsWeightTypeId = 1                  ! 0=exponential, 1=exponential-balanced, 2=encoded
+/
+
+
+&Output
+OutputFile = './output/M7.8FL34_0.1Hztopo5km_o3ga5e2c1e1_o3jan18_50s'
+Format = 10                          ! Format (10= no output, 6=hdf5 output)
+!             |stress     |vel
+iOutputMask = 0 0 0 0 0 0 0 0 0
+!                 |strain     |eta
+iPlasticityMask = 0 0 0 0 0 0 1
+printIntervalCriterion = 2           ! Criterion for index of printed info: 1=timesteps,2=time,3=timesteps+time
+TimeInterval = 25.                    ! Index of printed info at time
+refinement = 1
+OutputRegionBounds = 278478 445688 2989120 3154200 0e3 50e3 !(optional) array that describes the region 
+! of the wave field that should be written. Specified as 'xmin xmax ymin ymax zmin zmax'
+
+! off-fault ascii receivers
+! RFileName = 'rec_model3_new_1.0Hz_topo250_ref400fault.dat'
+RFileName = 'rec_model3_5kmtopo_1.0Hz.dat' !'rec_model3_new_fault_1Hz_topo250_f800.dat'      ! Record Points in extra file
+pickdt = 0.01                       ! Pickpoint Sampling
+pickDtType = 1                       ! Pickpoint Type
+! (Optional) Synchronization point for receivers.
+!            If omitted, receivers are written at the end of the simulation.
+ReceiverOutputInterval = 0.2
+
+! Free surface output
+
+/
+
+&AbortCriteria
+EndTime =50.0
+/
+
+&Analysis
+/
+
+&Debugging
+/
