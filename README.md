@@ -1,2 +1,2 @@
 # kathDocker
-docker container for building docker for kathmandu basin
+docker container for kathmandu basin
